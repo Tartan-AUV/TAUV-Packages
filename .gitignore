@@ -23,3 +23,6 @@ logs/
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 **/.history
+
+# Idea
+.idea

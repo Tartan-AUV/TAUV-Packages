@@ -17,15 +17,15 @@
         <param name="postprocess_depth" value="true" />
     </node>
 
-    <node pkg="tauv_vehicle"
-          type="oakd"
-          name="oakd_bottom"
-          output="screen"
-    >
-        <param name="frame" value="oakd_bottom" />
-        <param name="id" value="10.0.0.13" />
-        <param name="postprocess_depth" value="true" />
-    </node>
+<!--     <node pkg="tauv_vehicle" -->
+<!--           type="oakd" -->
+<!--           name="oakd_bottom" -->
+<!--           output="screen" -->
+<!--     > -->
+<!--         <param name="frame" value="oakd_bottom" /> -->
+<!--         <param name="id" value="10.0.0.13" /> -->
+<!--         <param name="postprocess_depth" value="true" /> -->
+<!--     </node> -->
 
     <group ns="vehicle/arduino">
         <node pkg="rosserial_python"
