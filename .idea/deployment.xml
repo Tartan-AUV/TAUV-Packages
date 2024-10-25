@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="kf" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+    <option name="confirmBeforeUploading" value="false" />
+    <serverData>
+      <paths name="kf">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/tartanauv/shared/tauv-mono" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/devel" />
+            <excludedPath local="true" path="$PROJECT_DIR$/build" />
+            <excludedPath local="true" path="$PROJECT_DIR$/src/tauv_sim" />
+            <excludedPath local="true" path="$PROJECT_DIR$/src/tauv_sim_gazebo_plugins" />
+            <excludedPath local="true" path="$PROJECT_DIR$/src/uuv_simulator" />
+            <excludedPath local="true" path="$PROJECT_DIR$/src/tauv_sim_worlds" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
