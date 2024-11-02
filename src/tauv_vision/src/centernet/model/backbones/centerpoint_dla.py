@@ -11,7 +11,7 @@ from torch import nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
-from tauv_vision.centernet.model.centernet import get_head_channels, Prediction
+from centernet.model.centernet import get_head_channels, Prediction
 
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)

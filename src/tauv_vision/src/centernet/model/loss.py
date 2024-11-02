@@ -5,9 +5,9 @@ from enum import Enum
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 
-from tauv_vision.centernet.model.centernet import Prediction
-from tauv_vision.centernet.model.decode import angle_get_bins
-from tauv_vision.centernet.model.config import ModelConfig, TrainConfig, ObjectConfig, ObjectConfigSet, AngleConfig
+from centernet.model.centernet import Prediction
+from centernet.model.decode import angle_get_bins
+from centernet.model.config import ModelConfig, TrainConfig, ObjectConfig, ObjectConfigSet, AngleConfig
 from tauv_vision.datasets.load.pose_dataset import PoseSample
 
 

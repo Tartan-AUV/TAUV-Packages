@@ -12,7 +12,7 @@ from PIL import Image
 import torchvision.transforms.v2 as T
 import torch.nn.functional as F
 
-from tauv_vision.centernet.model.config import ObjectConfigSet
+from centernet.model.config import ObjectConfigSet
 
 
 class Split(Enum):

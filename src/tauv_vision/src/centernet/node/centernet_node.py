@@ -17,11 +17,11 @@ from transform_client import TransformClient
 from tauv_util.cameras import CameraIntrinsics
 from tauv_util.spatialmath import ros_transform_to_se3, r3_to_ros_vector3, r3_to_ros_point
 from tauv_msgs.msg import FeatureDetection, FeatureDetections
-from tauv_vision.centernet.model.backbones.centerpoint_dla import CenterpointDLA34
-from tauv_vision.centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
-from tauv_vision.centernet.model.decode import decode_keypoints
+from centernet.model.backbones.centerpoint_dla import CenterpointDLA34
+from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
+from centernet.model.decode import decode_keypoints
 
-from tauv_vision.centernet.configs.samples_torpedo_bin_buoy import model_config, train_config, object_config
+from centernet.configs.samples_torpedo_bin_buoy import model_config, train_config, object_config
 
 
 object_t_detections: Dict[str, SE3] = {
@@ -109,11 +109,6 @@ class CenternetNode:
             [0, intrinsics.f_y, intrinsics.c_y],
             [0, 0, 0],
         ])
-
-        if platform.machine() == 'aarch64':
-            M_projection[0, 0] *= 1.33
-            M_projection[1, 1] *= 1.33
-            depth *= 1.33
 
 
         depth_debug = (depth * (255 / depth.max())).astype(np.uint8)

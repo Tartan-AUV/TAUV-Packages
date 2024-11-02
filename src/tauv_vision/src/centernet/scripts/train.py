@@ -8,17 +8,17 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
 
-from tauv_vision.centernet.model.centernet import Centernet, initialize_weights, get_head_channels
-from tauv_vision.centernet.model.backbones.dla import DLABackbone
-from tauv_vision.centernet.model.loss import loss
-from tauv_vision.centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
+from centernet.model.centernet import Centernet, initialize_weights, get_head_channels
+from centernet.model.backbones.dla import DLABackbone
+from centernet.model.loss import loss
+from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
 from tauv_vision.datasets.load.pose_dataset import PoseDataset, PoseSample, Split
 
-from tauv_vision.centernet.model.backbones.centerpoint_dla import CenterpointDLA34
+from centernet.model.backbones.centerpoint_dla import CenterpointDLA34
 
 torch.autograd.set_detect_anomaly(True)
 
-from tauv_vision.centernet.configs.samples_torpedo_bin_buoy import model_config, train_config, object_config
+from centernet.configs.samples_torpedo_bin_buoy import model_config, train_config, object_config
 
 
 

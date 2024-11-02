@@ -11,10 +11,10 @@ import torchvision.transforms.v2 as tfs
 import matplotlib.pyplot as plt
 import kornia.augmentation as A
 
-from tauv_vision.centernet.model.centernet import Centernet, initialize_weights, Truth
-from tauv_vision.centernet.model.backbones.dla import DLABackbone
-from tauv_vision.centernet.model.loss import gaussian_splat, loss
-from tauv_vision.centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
+from centernet.model.centernet import Centernet, initialize_weights, Truth
+from centernet.model.backbones.dla import DLABackbone
+from centernet.model.loss import gaussian_splat, loss
+from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
 
 torch.autograd.set_detect_anomaly(True)
 

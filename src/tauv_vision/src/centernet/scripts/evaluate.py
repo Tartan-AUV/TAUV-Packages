@@ -6,12 +6,12 @@ import albumentations as A
 from typing import Tuple
 import matplotlib.pyplot as plt
 
-from tauv_vision.centernet.model.centernet import Centernet, initialize_weights
-from tauv_vision.centernet.model.backbones.dla import DLABackbone
-from tauv_vision.centernet.model.loss import loss
-from tauv_vision.centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
+from centernet.model.centernet import Centernet, initialize_weights
+from centernet.model.backbones.dla import DLABackbone
+from centernet.model.loss import loss
+from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
 from tauv_vision.datasets.load.pose_dataset import PoseDataset, PoseSample, Split
-from tauv_vision.centernet.model.decode import decode, Detection
+from centernet.model.decode import decode, Detection
 
 
 model_config = ModelConfig(

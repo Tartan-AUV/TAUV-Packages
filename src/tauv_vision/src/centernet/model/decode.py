@@ -9,8 +9,8 @@ from math import pi, atan2
 import torch.nn.functional as F
 from spatialmath import SE3, SO3
 
-from tauv_vision.centernet.model.centernet import Prediction
-from tauv_vision.centernet.model.config import ModelConfig, ObjectConfigSet
+from centernet.model.centernet import Prediction
+from centernet.model.config import ModelConfig, ObjectConfigSet
 
 
 @dataclass
@@ -325,7 +325,7 @@ def depth_decode(prediction: torch.Tensor) -> torch.Tensor:
 
 
 def main():
-    from tauv_vision.centernet.model.loss import gaussian_splat
+    from centernet.model.loss import gaussian_splat
 
     heatmap = torch.cat((
         gaussian_splat(512, 512, 100, 100, 50).unsqueeze(0).unsqueeze(1),

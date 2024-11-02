@@ -1,6 +1,6 @@
 from math import pi
 
-from tauv_vision.centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
+from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
 
 
 model_config = ModelConfig(

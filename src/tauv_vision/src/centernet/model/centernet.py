@@ -3,8 +3,8 @@ from typing_extensions import Self
 from dataclasses import dataclass
 from math import pi
 
-from tauv_vision.centernet.model.backbones.dla import DLABackbone
-from tauv_vision.centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig
+from centernet.model.backbones.dla import DLABackbone
+from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig
 
 import torch
 import torch.nn as nn
