@@ -1,6 +1,8 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+SHELL ["/bin/bash", "-c"]  # todo: move up
+
 # Install vehicle-specific libraries
 RUN apt-get update && \
     apt-mark hold libopencv libopencv-core4.2 libopencv-dev && \ 
@@ -38,7 +40,6 @@ RUN mkdir -p cv_bridge_ws/src && \
     cd vision_opencv && \
     git checkout noetic
 
-SHELL ["/bin/bash", "-c"]  # todo: move up
 
 RUN cd cv_bridge_ws && \
     source /opt/ros/noetic/setup.bash && \
@@ -48,6 +49,8 @@ RUN cd cv_bridge_ws && \
 
 # this is sus, but pip install depthai-sdk doesn't work
 RUN python3 -m pip install --extra-index-url https://artifacts.luxonis.com/artifactory/luxonis-python-snapshot-local/ depthai
+
+RUN python3 -m pip install pyserial
 
 RUN apt-get update && apt-get install -y \
     ros-noetic-rosserial-python

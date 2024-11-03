@@ -20,13 +20,13 @@ echo "Starting container, VNC address: http://tauv-dev.lan.local.cmu.edu:60$(id 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 TAUV_MONO_DIR=$(realpath "$SCRIPT_DIR/../../")
 
-rocker \
-	--nvidia \
+docker run \
 	--privileged \
-	--port 60$(id -u | rev | cut -c1-3 | rev):8080 \
-	--volume $SHARED_DIR:/shared \
-        --volume $TAUV_MONO_DIR:/tauv-mono \
-	--volume /dev/shm:/dev/shm \
-	-- tauv/x86-nvidia-workstation
+	--gpus all \
+	-p "60$(id -u | rev | cut -c1-3 | rev):8080" \
+	--volume "$SHARED_DIR":/shared \
+  --volume "$TAUV_MONO_DIR":/tauv-mono \
+  -it \
+	tauv/x86-nvidia-workstation
 
 

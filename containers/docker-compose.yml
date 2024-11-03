@@ -1,16 +1,12 @@
 services:
+
   # Platform-specific layer
   orin-platform:
     image: tauv/orin-platform
     build:
       context: ./platform
       dockerfile: Dockerfile.orin
-  
-  x86-nvidia-platform:
-    image: tauv/x86-nvidia-platform
-    build:
-      context: ./platform
-      dockerfile: Dockerfile.x86-nvidia
+
 
   # Common layer
   orin-common:
@@ -22,47 +18,9 @@ services:
         BASE_IMAGE: tauv/orin-platform
     depends_on:
       - orin-platform
-  
-  x86-nvidia-common:
-    image: tauv/x86-nvidia-common
-    build:
-      context: ./common
-      dockerfile: Dockerfile.common
-      args:
-        BASE_IMAGE: tauv/x86-nvidia-platform
-    depends_on:
-      - x86-nvidia-platform
 
 
   # Application layer
-  tauv-x86-nvidia-workstation:
-    image: tauv/workstation
-    build:
-      context: ./apps
-      dockerfile: Dockerfile.workstation
-      args:
-        BASE_IMAGE: tauv/x86-nvidia-common
-    environment:
-      DISPLAY: "${DISPLAY}"
-      QT_X11_NO_MITSHM: "1"
-    volumes:
-      - /dev/dri:/dev/dri  # Mount the DRI device for GPU access TODO: Do we need this
-      - ${SHARED_DIR}:/shared  # Bind the SHARED_DIR to /shared in the container
-    tty: true  # Allocate a pseudo-TTY
-    stdin_open: true  # Keep stdin open TODO: DO WE NEED THIS
-    privileged: true
-    ports:
-      - 10122:22
-    depends_on:
-      - x86-nvidia-common
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
   tauv-kingfisher:
     build:
       context: ./apps/vehicle

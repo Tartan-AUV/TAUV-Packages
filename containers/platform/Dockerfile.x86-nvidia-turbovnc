@@ -11,5 +11,5 @@ RUN apt update && apt install -y \
     python3-pip
 
 RUN python3 -m pip install \
-    torch==2.0.* \
-    torchvision==0.14.1 
+    torch==2.1.* \
+    torchvision

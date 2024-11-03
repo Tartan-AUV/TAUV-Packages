@@ -4,4 +4,3 @@ FROM nvcr.io/nvidia/l4t-pytorch:r35.2.1-pth2.0-py3
 RUN apt-get update && apt-get install -y python3-pip
 
 # todo move up to vehicle
-RUN python3 -m pip install pyserial
