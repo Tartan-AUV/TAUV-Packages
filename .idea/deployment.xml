@@ -6,15 +6,16 @@
       <paths name="kf">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/tartanauv/shared/tauv-mono" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/tartanauv/tauv-mono" local="$PROJECT_DIR$" web="/" />
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/devel" />
             <excludedPath local="true" path="$PROJECT_DIR$/build" />
-            <excludedPath local="true" path="$PROJECT_DIR$/src/tauv_sim" />
-            <excludedPath local="true" path="$PROJECT_DIR$/src/tauv_sim_gazebo_plugins" />
-            <excludedPath local="true" path="$PROJECT_DIR$/src/uuv_simulator" />
-            <excludedPath local="true" path="$PROJECT_DIR$/src/tauv_sim_worlds" />
+            <excludedPath local="true" path="$PROJECT_DIR$/packages/tauv_sim" />
+            <excludedPath local="true" path="$PROJECT_DIR$/packages/tauv_sim_gazebo_plugins" />
+            <excludedPath local="true" path="$PROJECT_DIR$/packages/uuv_simulator" />
+            <excludedPath local="true" path="$PROJECT_DIR$/packages/tauv_sim_worlds" />
+            <excludedPath local="true" path="$PROJECT_DIR$/logs" />
           </excludedPaths>
         </serverdata>
       </paths>

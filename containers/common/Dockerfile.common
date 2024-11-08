@@ -87,3 +87,7 @@ RUN python3 -m pip install \
     aiohttp \
     protobuf
 
+RUN mkdir /scripts
+ENV PATH="/scripts:$PATH"
+COPY common/resources/rosrerun.sh /scripts/rosrerun
+

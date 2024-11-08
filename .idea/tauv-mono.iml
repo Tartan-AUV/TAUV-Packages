@@ -2,14 +2,14 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_common/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_gui/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_mission/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_sim/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_sim_gazebo_plugins/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_vehicle/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/tauv_vision/src" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/src/tauv_msgs" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_common/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_gui/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_mission/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_sim/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_sim_gazebo_plugins/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_vehicle/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/tauv_vision/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/tauv_msgs" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 virtualenv at ~/.virtualenvs/tauv-mono" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

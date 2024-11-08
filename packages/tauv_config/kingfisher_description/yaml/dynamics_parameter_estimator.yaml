@@ -4,31 +4,31 @@ error_covariance: [ 1.0e-4, 1.0e-4, 1.0e-4, 1.0e-4, 1.0e-4, 1.0e-4 ]
 
 parameters:
  m:
-   initial_value: 30
+   initial_value: 32.35
    fixed: true
    initial_covariance: 1.0e-12
    process_covariance: 1.0e-4
    limits: [0, 1.0e10]
  v:
-   initial_value: 0.03
+   initial_value: 0.0324
    fixed: false
    initial_covariance: 1.0e-12
    process_covariance: 1.0e-15
    limits: [0, 1.0e10]
  gx:
-   initial_value: 0
+   initial_value: 0.038
    fixed: true
    initial_covariance: 1.0e-12
    process_covariance: 1.0e-6
    limits: [-1.0e10, 1.0e10]
  gy:
-   initial_value: 0
+   initial_value: 0.021
    fixed: true
    initial_covariance: 1.0e-12
    process_covariance: 1.0e-6
    limits: [-1.0e10, 1.0e10]
  gz:
-   initial_value: 0
+   initial_value: 0.041
    fixed: true
    initial_covariance: 1.0e-12
    process_covariance: 1.0e-6

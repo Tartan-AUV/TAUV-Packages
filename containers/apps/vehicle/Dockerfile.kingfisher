@@ -55,12 +55,11 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y \
     tmux vim bmon htop
 
+COPY apps/vehicle/resources/env_dev.sh /scripts/env_dev
+
 RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
 RUN echo 'source /opt/tauv/packages/setup.bash' >> /root/.bashrc
 RUN echo 'source /shared/tauv-mono/devel/setup.bash' >> /root/.bashrc
-RUN mkdir -p /tools
-RUN echo 'export PATH=$PATH:/tauv-tools' >> /root/.bashrc
-COPY ../deployment/rosrerun.sh /tauv-tools/rosrerun
 
 WORKDIR /shared
 
