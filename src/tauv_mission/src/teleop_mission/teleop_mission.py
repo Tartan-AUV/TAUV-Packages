@@ -673,7 +673,7 @@ class TeleopMission:
         circle_buoy = subparsers.add_parser('circle_buoy')
         circle_buoy.add_argument('radius', type=float)
         circle_buoy.add_argument('latch', type=bool)
-        circle_buoy.set_defaults(func=self.git)
+        circle_buoy.set_defaults(func=self._handle_circle_buoy)
 
         debug_depth = subparsers.add_parser('debug_depth')
         debug_depth.set_defaults(func=self._handle_debug_depth)
