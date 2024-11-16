@@ -28,7 +28,7 @@ class OAKDNode:
         self._right = self._pipeline.create(depthai.node.MonoCamera)
 
         self._videoEncoder = self._pipeline.create(depthai.node.VideoEncoder)
-        self._videoEncoder.setDefaultProfilePreset(self._fps, depthai.VideoEncoderProperties.Profile.H265_MAIN)
+        self._videoEncoder.setDefaultProfilePreset(self._fps, depthai.VideoEncoderProperties.Profile.H264_MAIN)
         self._videoEncoder.setBitrateKbps(2000) #Comrpession Bit rate
 
 
@@ -121,11 +121,20 @@ class OAKDNode:
         Gst.init()
         main_loop = GLib.MainLoop()
         main_loop_thread = Thread(target = main_loop.run)
-        self._gst_pipeline = self._create_gstreaner_pipeline()
+        main_loop_thread.start()
+        self._gst_pipeline = self._create_gstreamer_pipeline()
+        print("before typo")
+        print("hello")
 
-    def _create_gstreaner_pipeline(self):
+    def _create_gstreamer_pipeline(self):
+        """
         gst_pipeline = (
             "appsrc name=src ! h265parse ! nvv4l2decoder ! nvvidconv ! videoconvert ! video/x-raw,format=RGB ! appsink name=sink"
+        )
+        """
+
+        gst_pipeline = (
+            "appsrc name=src ! h264parse name=parse ! avdec_h264 name=avdec ! queue name=q ! appsink name=sink"
         )
 
         pipeline = Gst.parse_launch(gst_pipeline)
@@ -158,18 +167,19 @@ class OAKDNode:
             self._depth_info_pub.publish(self._depth_info)
             self._color_info_pub.publish(self._color_info)
 
-            caps = Gst.Caps.from_string("video/x-h265, stream-format=byte-stream")
+            caps = Gst.Caps.from_string("video/x-h264, stream-format=byte-stream")
             self.appsrc.set_property("caps", caps)
 
             if rgb is not None:
                 try:
                     print("rbg not None")
                     packet = rgb_queue.get()
-                    packet_data = np.array(packet.getData(), dtype=np.uint8)
-                    input_buf = Gst.Buffer.new_allocate(None, packet_data.nbytes, None)
-                    input_buf.fill(0, packet_data)
-                    self.appsrc.emit("push-buffer", input_buf)
-                    sample = self.appsink.try_pull_sample(Gst.SECOND);
+                    #packet_data = np.array(packet.getData(), dtype=np.uint8)
+                    #breakpoint()
+                    #input_buf = Gst.Buffer.new_allocate(None, packet_data.nbytes, None)
+                    #input_buf.fill(0, packet_data)
+                    self.appsrc.emit("push-buffer", Gst.Buffer.new_wrapped(np.copy(packet.getData()).tobytes()))
+                    sample = self.appsink.try_pull_sample(Gst.SECOND * 0.2);
                     if sample:
                         print("passed pipeline")
                         output_buf = sample.get_buffer()
@@ -224,6 +234,7 @@ class OAKDNode:
         self._queue_size = 10
 
 def main():
+    print("my stuff")
     rospy.init_node('oakd')
     n = OAKDNode()
     n.start()
