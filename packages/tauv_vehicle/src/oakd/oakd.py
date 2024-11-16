@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-
+from threading import Thread
 import rospy
 import depthai
 from sensor_msgs.msg import Image, CameraInfo
 import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 
+#Binding to convert gstreamer library (C) to python
+import gi
+gi.require_version('Gst', '1.0')
+gi.require_version('GstApp', '1.0')
+from gi.repository import Gst, GLib, GstApp
+
+_ = GstApp
 # node to create oakd ros nodes from oakd api
 # publishes depth map and color image
 
@@ -19,6 +26,11 @@ class OAKDNode:
         self._depth = self._pipeline.create(depthai.node.StereoDepth)
         self._left = self._pipeline.create(depthai.node.MonoCamera)
         self._right = self._pipeline.create(depthai.node.MonoCamera)
+
+        self._videoEncoder = self._pipeline.create(depthai.node.VideoEncoder)
+        self._videoEncoder.setDefaultProfilePreset(self._fps, depthai.VideoEncoderProperties.Profile.H265_MAIN)
+        self._videoEncoder.setBitrateKbps(2000) #Comrpession Bit rate
+
 
         self._left.setBoardSocket(depthai.CameraBoardSocket.LEFT)
         self._right.setBoardSocket(depthai.CameraBoardSocket.RIGHT)
@@ -106,12 +118,38 @@ class OAKDNode:
         self._depth_info_pub = rospy.Publisher(f'vehicle/{self._frame}/depth/camera_info', CameraInfo, queue_size=1, latch=True)
         self._color_info_pub = rospy.Publisher(f'vehicle/{self._frame}/color/camera_info', CameraInfo, queue_size=1, latch=True)
 
+        Gst.init()
+        main_loop = GLib.MainLoop()
+        main_loop_thread = Thread(target = main_loop.run)
+        self._gst_pipeline = self._create_gstreaner_pipeline()
+
+    def _create_gstreaner_pipeline(self):
+        gst_pipeline = (
+            "appsrc name=src ! h265parse ! nvv4l2decoder ! nvvidconv ! videoconvert ! video/x-raw,format=RGB ! appsink name=sink"
+        )
+
+        pipeline = Gst.parse_launch(gst_pipeline)
+
+        # Retrieve the sink element to pull frames
+        self.appsrc = pipeline.get_by_name("src")
+        self.appsink = pipeline.get_by_name("sink")
+
+        # Set appsink to pull-mode to manually retrieve frames
+        self.appsink.set_property("emit-signals", True)
+        self.appsink.set_property("sync", False)
+        pipeline.set_state(Gst.State.PLAYING)
+        return pipeline
+
     def start(self):
+        #Cant the queue just be the source?
         rgb_queue = self._device.getOutputQueue(name='rgb', maxSize=1, blocking=False)
         depth_queue = self._device.getOutputQueue(name='depth', maxSize=1, blocking=False)
 
+        print("started")
+
         while not rospy.is_shutdown():
             try:
+                print("getting data")
                 rgb = rgb_queue.tryGet()
                 depth = depth_queue.tryGet()
             except Exception:
@@ -120,25 +158,62 @@ class OAKDNode:
             self._depth_info_pub.publish(self._depth_info)
             self._color_info_pub.publish(self._color_info)
 
+            caps = Gst.Caps.from_string("video/x-h265, stream-format=byte-stream")
+            self.appsrc.set_property("caps", caps)
+
             if rgb is not None:
                 try:
-                    img = self._bridge.cv2_to_imgmsg(rgb.getCvFrame()[:, :, ::-1], encoding='rgb8')
-                    img.header.frame_id = self._frame
-                    img.header.seq = rgb.getSequenceNum()
-                    img.header.stamp = self._time_offset + rospy.Time.from_sec(rgb.getTimestamp().total_seconds())
-                    self._color_pub.publish(img)
+                    print("rbg not None")
+                    packet = rgb_queue.get()
+                    packet_data = np.array(packet.getData(), dtype=np.uint8)
+                    input_buf = Gst.Buffer.new_allocate(None, packet_data.nbytes, None)
+                    input_buf.fill(0, packet_data)
+                    self.appsrc.emit("push-buffer", input_buf)
+                    sample = self.appsink.try_pull_sample(Gst.SECOND);
+                    if sample:
+                        print("passed pipeline")
+                        output_buf = sample.get_buffer()
+                        result, map_info = output_buf.map(Gst.MapFlags.READ)
+                        if result:
+                            print("sample post pipeline")
+                            # Convert to numpy array
+                            decoded_img = np.frombuffer(map_info.data, dtype=np.uint8).reshape(1080, 1920, 3)
+                            output_buf.unmap(map_info)
+
+                            img = self._bridge.cv2_to_imgmsg(decoded_img, encoding='rgb8')
+                            img.header.frame_id = self._frame
+                            img.header.seq = rgb.getSequenceNum()
+                            img.header.stamp = self._time_offset + rospy.Time.from_sec(rgb.getTimestamp().total_seconds())
+                            self._color_pub.publish(img)
                 except CvBridgeError as e:
                     rospy.loginfo(f'OAKD frame error: {e}')
 
+            
             if depth is not None:
                 try:
-                    img = self._bridge.cv2_to_imgmsg(depth.getCvFrame(), encoding='mono16')
-                    img.header.frame_id = self._frame
-                    img.header.seq = depth.getSequenceNum()
-                    img.header.stamp = self._time_offset + rospy.Time.from_sec(depth.getTimestamp().total_seconds())
-                    self._depth_pub.publish(img)
+                    packet = depth_queue.get()
+                    packet_data = np.array(packet.getData(), dtype=np.uint8)
+                    input_buf = Gst.Buffer.new_allocate(None, packet_data.nbytes, None)
+                    input_buf.fill(0, packet_data)
+                    self.appsrc.emit("push-buffer", input_buf)
+                    sample = self.appsink.try_pull_sample(Gst.SECOND);
+                    if sample:
+                        output_buf = sample.get_buffer()
+                        result, map_info = output_buf.map(Gst.MapFlags.READ)
+                        if result:
+                            # Convert to numpy array
+                            decoded_img = np.frombuffer(map_info.data, dtype=np.uint8).reshape(1080, 1920, 3)
+                            output_buf.unmap(map_info)
+
+                            img = self._bridge.cv2_to_imgmsg(decoded_img, encoding='mono16')
+                            img.header.frame_id = self._frame
+                            img.header.seq = depth.getSequenceNum()
+                            img.header.stamp = self._time_offset + rospy.Time.from_sec(depth.getTimestamp().total_seconds())
+                            self._depth_pub.publish(img)
                 except CvBridgeError as e:
                     rospy.loginfo(f'OAKD frame error: {e}')
+            
+
 
     def _load_config(self):
         self._tf_namespace = rospy.get_param('tf_namespace')
@@ -152,3 +227,7 @@ def main():
     rospy.init_node('oakd')
     n = OAKDNode()
     n.start()
+
+#Should add something so pipeline.set_state(Gst.State.Null)
+#main_loop.quit()
+#main_loop.thread.join()
