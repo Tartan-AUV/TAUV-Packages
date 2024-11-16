@@ -1,5 +1,0 @@
-#!/usr/bin/env python3
-from tauv_vision.centernet.node import centernet_node
-
-if __name__ == "__main__":
-    centernet_node.main()

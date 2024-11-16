@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- =======================  -->
+  <!--        Arguments         -->
+  <!-- =======================  -->
+
+  <!-- Name of the robot model  -->
+  <arg name="model_name" default="kingfisher"/>
+  <arg name="namespace" default="kf"/>
+
+  <arg name="teleop" default="true"/>
+
+ <!-- =======================  -->
+  <!--       Load Configs       -->
+  <!-- =======================  -->
+
+  <!-- figure out path to vehicle configurations based on model name  -->
+  <arg name="config_pkg" default="$(eval find(arg('model_name') + '_description'))"/>
+
+  <!-- =======================  -->
+  <!--  Launch Vehicle / Cams   -->
+  <!-- =======================  -->
+<!--  <include file="$(find tauv_common)/launch/transform_manager/retare_sub_position.launch"/>-->
+<!--  <include file="$(find tauv_common)/launch/darknet_ros/darknet_ros.launch"/>--> -->
+  <group ns="$(arg namespace)">
+    <param name="tf_namespace" value="$(arg namespace)" />
+
+    <include file="$(find tauv_common)/launch/alarms/alarms.launch" />
+
+    <include file="$(arg config_pkg)/launch/vehicle.launch">
+          <arg name="config_pkg" value="$(arg config_pkg)" />
+    </include>
+    <include file="$(arg config_pkg)/launch/transforms.launch">
+          <arg name="namespace" value="$(arg namespace)" />
+    </include>
+
+    <!-- =======================  -->
+    <!-- Launch abstract systems  -->
+    <!-- =======================  -->
+
+    <!-- Launch the alarm server:  -->
+
+    <!-- Launch the message printer -->
+    <node pkg="tauv_common" type="message_printer" name="message_printer" output="log"/>
+
+    <!-- Start the GNC system: -->
+    <include file="$(find tauv_common)/launch/gnc/gnc.launch">
+      <arg name="model_name" value="$(arg model_name)"/>
+      <arg name="teleop" value="$(arg teleop)" />
+    </include>
+
+    <node pkg="tauv_vision" type="centernet" name="centernet" output="screen">
+      <rosparam param="frame_ids">[oakd_front]</rosparam>-->
+    </node>
+
+    <rosparam command="load" file="$(arg config_pkg)/yaml/global_map.yaml" />
+
+    <node
+        pkg="tauv_common"
+        type="global_map_cpp"
+        name="global_map"
+        output="screen"
+    >
+    </node>
+
+    <node
+        pkg="tauv_gui"
+        type="map_visualizer"
+        name="map_visualizer"
+        output="screen"
+    >
+        <rosparam command="load" file="$(find tauv_gui)/yaml/map_visualizer.yaml"/>
+    </node>
+
+<!--     <include file="$(find tauv_common)/launch/vision/vision.launch"> -->
+<!--           <arg name="config_pkg" value="$(arg config_pkg)" /> -->
+<!--     </include> -->
+
+    <rosparam command="load" file="$(arg config_pkg)/yaml/actuators.yaml" ns="actuators"/>
+    <rosparam command="load" file="$(arg config_pkg)/yaml/motion.yaml" ns="motion"/>
+
+    <!-- Start the vision system: -->
+    <!-- Launch mission system -->
+    <!--     <node pkg="tauv_mission" type="mission_manager" name="mission_manager" output="screen"/> -->
+  </group>
+</launch>
