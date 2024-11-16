@@ -3,6 +3,13 @@
   <component name="PublishConfigData" serverName="kf" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
+      <paths name="gryabtse@tauv-dev:22 password">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="kf">
         <serverdata>
           <mappings>
@@ -16,6 +23,7 @@
             <excludedPath local="true" path="$PROJECT_DIR$/packages/uuv_simulator" />
             <excludedPath local="true" path="$PROJECT_DIR$/packages/tauv_sim_worlds" />
             <excludedPath local="true" path="$PROJECT_DIR$/logs" />
+            <excludedPath local="true" path="$PROJECT_DIR$/.venv" />
           </excludedPaths>
         </serverdata>
       </paths>
