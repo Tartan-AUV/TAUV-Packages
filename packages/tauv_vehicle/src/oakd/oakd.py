@@ -5,6 +5,7 @@ import depthai
 from sensor_msgs.msg import Image, CameraInfo
 import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
+import time
 
 #Binding to convert gstreamer library (C) to python
 import gi
@@ -28,7 +29,7 @@ class OAKDNode:
         self._right = self._pipeline.create(depthai.node.MonoCamera)
 
         self._videoEncoder = self._pipeline.create(depthai.node.VideoEncoder)
-        self._videoEncoder.setDefaultProfilePreset(self._fps, depthai.VideoEncoderProperties.Profile.H264_MAIN)
+        self._videoEncoder.setDefaultProfilePreset(self._fps, depthai.VideoEncoderProperties.Profile.H265_MAIN)
         self._videoEncoder.setBitrateKbps(2000) #Comrpession Bit rate
 
 
@@ -55,10 +56,6 @@ class OAKDNode:
         self._color.setColorOrder(depthai.ColorCameraProperties.ColorOrder.RGB)
         self._color.setFps(self._fps)
 
-        self._color_manip = self._pipeline.create(depthai.node.ImageManip)
-        self._color_manip.setResize(640, 360)
-        self._color_manip.setMaxOutputFrameSize(640 * 360 * 3)
-
         self._depth.setDefaultProfilePreset(depthai.node.StereoDepth.PresetMode.HIGH_DENSITY)
         self._depth.setLeftRightCheck(True)
         self._depth.setExtendedDisparity(False)
@@ -83,8 +80,10 @@ class OAKDNode:
         self._left.out.link(self._depth.left)
         self._right.out.link(self._depth.right)
         self._depth.depth.link(self._xout_depth.input)
-        self._color.isp.link(self._color_manip.inputImage)
-        self._color_manip.out.link(self._xout_color.input)
+        self._color.video.link(self._videoEncoder.input)
+        # self._color_manip.out.link(self._videoEncoder.input)
+        self._videoEncoder.setKeyframeFrequency(5)
+        self._videoEncoder.bitstream.link(self._xout_color.input)
 
         self._device = None
         while self._device is None and not rospy.is_shutdown():
@@ -134,7 +133,7 @@ class OAKDNode:
         """
 
         gst_pipeline = (
-            "appsrc name=src ! h264parse name=parse ! avdec_h264 name=avdec ! queue name=q ! appsink name=sink"
+            "appsrc name=src is-live=true block=true format=GST_FORMAT_TIME ! h265parse name=parse ! nvv4l2decoder ! nvvidconv ! videoconvert ! video/x-raw,format=RGB ! appsink name=sink"
         )
 
         pipeline = Gst.parse_launch(gst_pipeline)
@@ -146,12 +145,16 @@ class OAKDNode:
         # Set appsink to pull-mode to manually retrieve frames
         self.appsink.set_property("emit-signals", True)
         self.appsink.set_property("sync", False)
+
+        # caps = Gst.Caps.from_string("video/x-h265, stream-format=byte-stream, alignment=nal")
+        # self.appsrc.set_property("caps", caps)
+
         pipeline.set_state(Gst.State.PLAYING)
         return pipeline
 
     def start(self):
         #Cant the queue just be the source?
-        rgb_queue = self._device.getOutputQueue(name='rgb', maxSize=1, blocking=False)
+        rgb_queue = self._device.getOutputQueue(name='rgb', maxSize=1, blocking=True)
         depth_queue = self._device.getOutputQueue(name='depth', maxSize=1, blocking=False)
 
         print("started")
@@ -167,8 +170,6 @@ class OAKDNode:
             self._depth_info_pub.publish(self._depth_info)
             self._color_info_pub.publish(self._color_info)
 
-            caps = Gst.Caps.from_string("video/x-h264, stream-format=byte-stream")
-            self.appsrc.set_property("caps", caps)
 
             if rgb is not None:
                 try:
@@ -178,7 +179,7 @@ class OAKDNode:
                     #breakpoint()
                     #input_buf = Gst.Buffer.new_allocate(None, packet_data.nbytes, None)
                     #input_buf.fill(0, packet_data)
-                    self.appsrc.emit("push-buffer", Gst.Buffer.new_wrapped(np.copy(packet.getData()).tobytes()))
+                    self.appsrc.emit("push-buffer", Gst.Buffer.new_wrapped(packet.getData().tobytes()))
                     sample = self.appsink.try_pull_sample(Gst.SECOND * 0.2);
                     if sample:
                         print("passed pipeline")
@@ -206,7 +207,7 @@ class OAKDNode:
                     input_buf = Gst.Buffer.new_allocate(None, packet_data.nbytes, None)
                     input_buf.fill(0, packet_data)
                     self.appsrc.emit("push-buffer", input_buf)
-                    sample = self.appsink.try_pull_sample(Gst.SECOND);
+                    sample = self.appsink.try_pull_sample(Gst.SECOND)
                     if sample:
                         output_buf = sample.get_buffer()
                         result, map_info = output_buf.map(Gst.MapFlags.READ)
@@ -222,6 +223,8 @@ class OAKDNode:
                             self._depth_pub.publish(img)
                 except CvBridgeError as e:
                     rospy.loginfo(f'OAKD frame error: {e}')
+
+            # time.sleep(0.095)
             
 
 
