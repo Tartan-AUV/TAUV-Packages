@@ -17,4 +17,9 @@ echo "NoVNC server started on port $NOVNC_PORT"
 
 source /root/.bashrc
 export DISPLAY=$DISPLAY
-exec "$@"
+
+mkdir -p /shared/tauv_ws/src
+cd /shared/tauv_ws
+ln -snf ../../../tauv-packages /shared/tauv_ws/src/tauv-packages
+
+exec /bin/bash

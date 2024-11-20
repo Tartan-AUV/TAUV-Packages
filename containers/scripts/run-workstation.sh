@@ -15,7 +15,9 @@ fi
 
 echo "Using shared folder: $SHARED_DIR"
 
-echo "Starting container, VNC address: http://tauv-dev.lan.local.cmu.edu:60$(id -u | rev | cut -c1-3 | rev)/vnc.html"
+HOSTNAME=$(hostname)
+
+echo "Starting container, VNC address: http://${HOSTNAME}.lan.local.cmu.edu:60$(id -u | rev | cut -c1-3 | rev)/vnc.html"
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 TAUV_MONO_DIR=$(realpath "$SCRIPT_DIR/../../")
@@ -24,8 +26,8 @@ rocker \
 	--nvidia \
 	--privileged \
 	--port 60$(id -u | rev | cut -c1-3 | rev):8080 \
+  --volume $TAUV_MONO_DIR/packages:/tauv-packages \
 	--volume $SHARED_DIR:/shared \
-        --volume $TAUV_MONO_DIR:/tauv-mono \
 	--volume /dev/shm:/dev/shm \
 	-- tauv/x86-nvidia-workstation
 
