@@ -15,7 +15,7 @@ dynamics:
   mass: 35.5
 
   # m^3
-  volume: 0.03566
+  volume: 0.032
 
   # kg / m^3
   water_density: 1028.0
