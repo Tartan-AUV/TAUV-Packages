@@ -12,17 +12,17 @@ max_wrench: [ 100.0, 100.0, 100.0, 100.0, 100.0, 100.0 ]
 
 dynamics:
   # kg
-  mass: 35.5
+  mass: 32.35
 
   # m^3
-  volume: 0.03566
+  volume: 0.03509
 
   # kg / m^3
   water_density: 1028.0
 
   # x, y, z in body NED
-  center_of_gravity: [0.0, 0.0, 0.0]
-  center_of_buoyancy: [-0.021, -0.0015, 0.0]
+  center_of_gravity: [0.0384, 0.02095, 0.0411]
+  center_of_buoyancy: [0.0611, 0.00273, 0.0411]
 
   # Ixx, Iyy, Izz, Ixy, Ixz, Iyz
   moments: [1.0, 1.0, 10.0, 0.0, 0.0, 0.0]
