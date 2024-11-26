@@ -8,52 +8,52 @@ update_controller: true
 
 parameters:
  m:
-   initial: 35.5
+   initial: 32.35
    fixed: true
    min: 25
    max: 35
    lr: 1
  v:
-   initial: 0.03
+   initial: 0.03509
    fixed: false
    min: 0.02
    max: 0.04
    lr: 1e-5
  gx:
-   initial: 0
+   initial: 0.0384
    fixed: true
    min: -0.01
    max: 0.01
    lr: 1
  gy:
-   initial: 0
+   initial: 0.02095
    fixed: true
    min: -0.01
    max: 0.01
    lr: 1
  gz:
-   initial: 0
+   initial: 0.0411
    fixed: true
    min: -0.01
    max: 0.01
    lr: 1
  bx:
-   initial: 0.0
-   fixed: false
-   min: -0.05
-   max: 0.05
+   initial: 0.0611
+   fixed: true
+   min: -0.1
+   max: 0.1
    lr: 5e-5
  by:
-   initial: 0
-   fixed: false
-   min: -0.01
-   max: 0.01
+   initial: 0.00273
+   fixed: true
+   min: -0.1
+   max: 0.1
    lr: 5e-5
  bz:
-   initial: 0.0
+   initial: 0.0411
    fixed: true
    min: -0.2
-   max: 0
+   max: 0.2
    lr: 1e-6
  Ixx:
    initial: 1
