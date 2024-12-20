@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tauv_vision_models"
+version = "0.1.0"
+description = "TAUV Vision Models"
+authors = [
+    { name = "Gleb Ryabtsev", email = "gryabtse@andrew.cmu.edu" }
+]
+readme = "README.md"
+dependencies = [
+    "torch>=2.5.1",
+    "torchvision",
+    "numpy>=2.2",
+    "spatialmath-python",
+]
+
+[tool.setuptools.packages.find]
+where = [
+    "."
+]

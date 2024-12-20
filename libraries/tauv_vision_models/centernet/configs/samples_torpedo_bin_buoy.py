@@ -29,7 +29,7 @@ train_config = TrainConfig(
     loss_lambda_offset=0.0,
     loss_lambda_angle=0.1,
     loss_lambda_depth=0.1,
-    n_workers=8,
+    n_workers=16,
     weight_save_interval=10,
 )
 

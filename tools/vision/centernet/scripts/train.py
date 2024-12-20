@@ -7,42 +7,30 @@ import albumentations as A
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
+from cloudpathlib import CloudPath, S3Client
 
 from centernet.model.centernet import Centernet, initialize_weights, get_head_channels
 from centernet.model.backbones.dla import DLABackbone
-from centernet.model.loss import loss
+from utils.loss import loss
 from centernet.model.config import ObjectConfig, ObjectConfigSet, AngleConfig, ModelConfig, TrainConfig
-from tauv_vision.datasets.load.pose_dataset import PoseDataset, PoseSample, Split
-
 from centernet.model.backbones.centerpoint_dla import CenterpointDLA34
+from centernet.configs.samples_torpedo_bin_buoy import model_config, train_config, object_config
+
+from datasets.load.pose_dataset import PoseDataset, PoseSample, Split
 
 torch.autograd.set_detect_anomaly(True)
 
-from centernet.configs.samples_torpedo_bin_buoy import model_config, train_config, object_config
-
-
+client = S3Client(local_cache_dir="/home/gryabtse/data/tauv/s3-cache")
 
 train_dataset_roots = [
-    pathlib.Path("~/Documents/TAUV-Datasets-New/stand-traditional-issue").expanduser(), # Samples
-    pathlib.Path("~/Documents/TAUV-Datasets-New/keep-happy-lot").expanduser(), # Torpedo
-    pathlib.Path("~/Documents/TAUV-Datasets-New/turn-black-woman").expanduser(), # Buoy
-    pathlib.Path("~/Documents/TAUV-Datasets-New/write-foreign-office").expanduser(), # Bin
-    pathlib.Path("~/Documents/TAUV-Datasets-New/hold-medical-issue").expanduser(), # Sample bin
-    pathlib.Path("~/Documents/TAUV-Datasets-New/continue-physical-month").expanduser(),  # New Bin
-    pathlib.Path("~/Documents/TAUV-Datasets-New/allow-hard-research").expanduser(),  # Gate
-    pathlib.Path("~/Documents/TAUV-Datasets-New/get-green-child").expanduser(),  # Path
+    pathlib.Path("~/data/tauv/tauv-datasets/happen-right-city").expanduser(),# everything
+    pathlib.Path("~/data/tauv/tauv-datasets/keep-happy-lot").expanduser(),  # torpedoes
 ]
 val_dataset_roots = [
-    pathlib.Path("~/Documents/TAUV-Datasets-New/stand-traditional-issue").expanduser(),  # Samples
-    pathlib.Path("~/Documents/TAUV-Datasets-New/keep-happy-lot").expanduser(),  # Torpedo
-    pathlib.Path("~/Documents/TAUV-Datasets-New/turn-black-woman").expanduser(),  # Buoy
-    pathlib.Path("~/Documents/TAUV-Datasets-New/write-foreign-office").expanduser(),  # Bin
-    pathlib.Path("~/Documents/TAUV-Datasets-New/hold-medical-issue").expanduser(),  # Sample bin
-    pathlib.Path("~/Documents/TAUV-Datasets-New/continue-physical-month").expanduser(),  # New Bin
-    pathlib.Path("~/Documents/TAUV-Datasets-New/allow-hard-research").expanduser(),  # Gate
-    pathlib.Path("~/Documents/TAUV-Datasets-New/get-green-child").expanduser(),  # Path
+    pathlib.Path("~/data/tauv/tauv-datasets/happen-right-city").expanduser(),# everything
+    pathlib.Path("~/data/tauv/tauv-datasets/keep-happy-lot").expanduser(),  # torpedoes
 ]
-results_root = pathlib.Path("~/Documents/centernet_runs").expanduser()
+results_root = pathlib.Path("~/data/tauv/centernet_runs").expanduser()
 
 # checkpoint_path = pathlib.Path("~/Documents/centernet_checkpoints/stellar-river-293_9.pt").expanduser()
 checkpoint_path = None
@@ -157,6 +145,7 @@ def run_validation_epoch(epoch_i, centernet, data_loader, device):
 
 train_transform = A.Compose(
     [
+        A.ToGray(num_output_channels=1, method="weighted_average", p=1),
         A.RandomSizedCrop(
             min_max_height=(260, 360),
             w2h_ratio=640 / 360,
@@ -164,17 +153,11 @@ train_transform = A.Compose(
             height=360,
             p=0.25,
         ),
-        A.HueSaturationValue(
-            hue_shift_limit=(-20, 20),
-            sat_shift_limit=(-30, 30),
-            val_shift_limit=(-20, 20),
-            p=0.5,
-        ),
         A.Flip(),
         A.Blur(),
         A.GaussNoise(),
         A.PiecewiseAffine(scale=[0.01, 0.02], nb_rows=4, nb_cols=4, p=0.1),
-        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), always_apply=True),
+        A.Normalize(mean=(0.5,), std=(0.5,), always_apply=True),
     ],
     bbox_params=A.BboxParams(format="albumentations", label_fields=["bbox_labels", "bbox_indices", "roll", "pitch", "yaw", "depth"]),
     keypoint_params=A.KeypointParams(format="xy", label_fields=["keypoint_labels", "keypoint_object_indices"]),
@@ -183,7 +166,8 @@ train_transform = A.Compose(
 
 val_transform = A.Compose(
     [
-        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), always_apply=True)
+        A.ToGray(num_output_channels=1, method="weighted_average", p=1),
+        A.Normalize(mean=(0.5,), std=(0.5,), always_apply=True),
     ],
     bbox_params=A.BboxParams(format="albumentations",
                              label_fields=["bbox_labels", "bbox_indices", "roll", "pitch", "yaw", "depth"]),
@@ -196,13 +180,14 @@ def main():
         checkpoint.unlink()
 
     wandb.init(
-        project="centernet",
+        entity="tartanauv",
+        project="centernet-grayscale",
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"running on {device}")
 
-    centernet = CenterpointDLA34(object_config).to(device)
+    centernet = CenterpointDLA34(object_config, input_channels=1).to(device)
     if checkpoint_path is not None:
         centernet.load_state_dict(torch.load(checkpoint_path))
     centernet.train()

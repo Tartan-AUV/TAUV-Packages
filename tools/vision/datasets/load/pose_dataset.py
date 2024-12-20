@@ -1,4 +1,6 @@
 from enum import Enum
+
+import cloudpathlib
 import numpy as np
 import pathlib
 import random
@@ -67,7 +69,7 @@ class PoseSample:
 
         img_pil = Image.open(img_path).convert("RGB")
 
-        to_tensor = T.Compose([T.ToImageTensor(), T.ConvertImageDtype()])
+        to_tensor = T.Compose([T.ToImage(), T.ConvertImageDtype()])
 
         img_np = np.array(img_pil.convert("RGB"))
 
@@ -356,18 +358,18 @@ class PoseSample:
 
 class PoseDataset(Dataset):
 
-    def __init__(self, root: pathlib.Path, split: Split, label_id_to_index: Dict[str, int], object_config: ObjectConfigSet, transform):
+    def __init__(self, root: [pathlib.Path | cloudpathlib.CloudPath], split: Split, label_id_to_index: Dict[str, int], object_config: ObjectConfigSet, transform):
         super().__init__()
 
-        self._root_path: pathlib.Path = root
+        self._root_path: [pathlib.Path | cloudpathlib.CloudPath] = root
         self._split: Split = split
 
-        if not self._root_path.is_dir():
+        if not isinstance(self._root_path, cloudpathlib.CloudPath) and not self._root_path.is_dir():
             raise ValueError(f"No such directory: {self._root_path}")
 
-        self._data_path: pathlib.Path = self._root_path / "data"
+        self._data_path: [pathlib.Path | cloudpathlib.CloudPath] = self._root_path / "data"
 
-        if not self._data_path.is_dir():
+        if not isinstance(self._root_path, cloudpathlib.CloudPath) and not self._data_path.is_dir():
             raise ValueError(f"No such directory: {self._data_path}")
 
         self._ids: [str] = self._get_ids()

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tauv_vision"
+version = "0.1.0"
+description = "Standalone project config for TAUV Vision"
+authors = [
+    {name = "Theo Chemel", email = "tchemel@andrew.cmu.edu"},
+    {name = "Gleb Ryabtsev", email = "gryabtse@andrew.cmu.edu"}
+]
+#requires-python = ">3.12"
+dependencies = [
+    "torch>=2.5.1",
+    "numpy>=2.2",
+    "matplotlib",
+    "opencv-python",
+    "albumentations",
+    "wandb",
+    "spatialmath-python",
+    "tauv_vision_models"
+]
+
+[tool.setuptools.packages.find]
+where = [
+    "."
+]
+

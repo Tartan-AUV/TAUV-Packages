@@ -223,12 +223,12 @@ class Tree(nn.Module):
 
 class DLA(nn.Module):
     def __init__(self, levels, channels, num_classes=1000,
-                 block=BasicBlock, residual_root=False, linear_root=False):
+                 block=BasicBlock, input_channels=3, residual_root=False, linear_root=False):
         super(DLA, self).__init__()
         self.channels = channels
         self.num_classes = num_classes
         self.base_layer = nn.Sequential(
-            nn.Conv2d(3, channels[0], kernel_size=7, stride=1,
+            nn.Conv2d(input_channels, channels[0], kernel_size=7, stride=1,
                       padding=3, bias=False),
             nn.BatchNorm2d(channels[0], momentum=BN_MOMENTUM),
             nn.ReLU(inplace=True))
@@ -476,12 +476,12 @@ class Interpolate(nn.Module):
 
 class DLASeg(nn.Module):
     def __init__(self, base_name, heads, pretrained, down_ratio, final_kernel,
-                 last_level, head_conv, out_channel=0):
+                 last_level, head_conv, input_channels=3, out_channel=0):
         super(DLASeg, self).__init__()
         assert down_ratio in [2, 4, 8, 16]
         self.first_level = int(np.log2(down_ratio))
         self.last_level = last_level
-        self.base = globals()[base_name](pretrained=pretrained)
+        self.base = globals()[base_name](pretrained=pretrained, input_channels=input_channels)
         channels = self.base.channels
         scales = [2 ** i for i in range(len(channels[self.first_level:]))]
         self.dla_up = DLAUp(self.first_level, channels[self.first_level:], scales)
@@ -532,20 +532,20 @@ class DLASeg(nn.Module):
         return z
 
 
-def get_pose_net(num_layers, heads, head_conv=256, down_ratio=4):
+def get_pose_net(num_layers, heads, head_conv=256, down_ratio=4, input_channels=3):
     model = DLASeg('dla{}'.format(num_layers), heads,
                    pretrained=True,
                    down_ratio=down_ratio,
                    final_kernel=1,
                    last_level=5,
-                   head_conv=head_conv)
+                   head_conv=head_conv,
+                   input_channels=input_channels)
     return model
 
 
 class CenterpointDLA34(nn.Module):
 
-
-    def __init__(self, object_config):
+    def __init__(self, object_config, input_channels=3):
         super(CenterpointDLA34, self).__init__()
 
         self.object_config = object_config
@@ -554,7 +554,7 @@ class CenterpointDLA34(nn.Module):
 
         self.model = get_pose_net(34, {
             str(i): c for (i, c) in enumerate(head_channels)
-        })
+        }, input_channels=input_channels)
 
     def forward(self, x):
         out = self.model(x)

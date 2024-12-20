@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from centernet.model.centernet import Prediction
 from centernet.model.decode import angle_get_bins
 from centernet.model.config import ModelConfig, TrainConfig, ObjectConfig, ObjectConfigSet, AngleConfig
-from tauv_vision.datasets.load.pose_dataset import PoseSample
+from datasets.load.pose_dataset import PoseSample
 
 
 @dataclass
