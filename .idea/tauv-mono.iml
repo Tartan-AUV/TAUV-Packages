@@ -11,7 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/packages/tauv_vision/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/packages/tauv_msgs" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.8 virtualenv at ~/.virtualenvs/tauv-mono" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
