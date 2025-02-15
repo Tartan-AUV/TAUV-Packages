@@ -4,6 +4,7 @@ import rospy
 from sensor_msgs.msg import Image
 from stereo_msgs.msg import DisparityImage
 import numpy as np
+import cv2
 from cv_bridge import CvBridge
 
 

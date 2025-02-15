@@ -53,7 +53,7 @@
     <!--   <rosparam param="confidence_threshold">0.95</rosparam>--> -->
     <!-- </node> -->
     <node pkg="tauv_vision" type="centernet" name="centernet" output="screen">
-      <rosparam param="frame_ids">[oakd_front, oakd_bottom]</rosparam>-->
+      <rosparam param="frame_ids">[oakd_front]</rosparam>
     </node>
 
     <rosparam command="load" file="$(arg config_pkg)/yaml/global_map.yaml" />
