@@ -2,7 +2,6 @@ import rospy
 import numpy as np
 import torch
 from spatialmath import SE3, SO3
-from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CameraInfo
 from functools import partial
 from typing import Dict
@@ -10,6 +9,7 @@ import pathlib
 from math import pi
 import torchvision.transforms as T
 import cv2
+from cv_bridge import CvBridge
 from threading import Lock
 import platform
 
@@ -32,10 +32,7 @@ object_t_detections: Dict[str, SE3] = {
 # weights_path = pathlib.Path("/shared/weights/dauntless-disco-272-latest.pt").expanduser()
 
 weights_name = 'breezy-yoghurt-1521-latest.pt'
-if platform.machine() == 'aarch64':
-    weights_path = pathlib.Path(f'/shared/weights/{weights_name}')
-else:
-    weights_path = pathlib.Path(f"~/catkin_ws/weights/{weights_name}").expanduser()
+weights_path = pathlib.Path(f"~/ros_ws/weights/{weights_name}").expanduser()
 
 
 class CenternetNode:
@@ -69,8 +66,8 @@ class CenternetNode:
             self._camera_infos[frame_id] = rospy.wait_for_message(f"vehicle/{frame_id}/depth/camera_info", CameraInfo, 60)
             self._intrinsics[frame_id] = CameraIntrinsics.from_matrix(np.array(self._camera_infos[frame_id].K))
 
-            self._color_subs[frame_id] = rospy.Subscriber(f"vehicle/{frame_id}/color/image_raw", Image, partial(self._handle_img, frame_id=frame_id))
-            self._depth_subs[frame_id] = rospy.Subscriber(f'vehicle/{frame_id}/depth/image_raw', Image, self._handle_depth, callback_args=frame_id)
+            self._color_subs[frame_id] = rospy.Subscriber(f"vehicle/{frame_id}/color/image_raw", Image, partial(self._handle_img, frame_id=frame_id), queue_size=1)
+            self._depth_subs[frame_id] = rospy.Subscriber(f'vehicle/{frame_id}/depth/image_raw', Image, self._handle_depth, callback_args=frame_id, queue_size=1)
 
             self._debug_pubs[frame_id] = rospy.Publisher(f"centernet/{frame_id}/debug", Image, queue_size=10)
 
@@ -136,9 +133,10 @@ class CenternetNode:
         except Exception as e:
             rospy.logwarn(e)
             rospy.logwarn("Failed to get transform")
+            print('failed to get transforms')
             return
 
-        rospy.logdebug("Got transforms")
+        print("Got transforms")
 
         detection_debug_np = color_np.copy()
 

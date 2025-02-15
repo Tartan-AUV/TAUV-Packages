@@ -53,7 +53,7 @@
 
     <gazebo reference="${ns}/front_oakd_link">
         <sensor name="oakd_front" type="depth">
-            <update_rate>10</update_rate>
+            <update_rate>0.5</update_rate>
             <camera>
           <horizontal_fov>${oakd_color_hfov}</horizontal_fov>
               <image>
@@ -100,7 +100,7 @@
 
     <gazebo reference="${ns}/bottom_oakd_link">
         <sensor name="oakd_bottom" type="depth">
-            <update_rate>10</update_rate>
+            <update_rate>0.5</update_rate>
             <camera>
             <horizontal_fov>${oakd_color_hfov}</horizontal_fov>
               <image>
