@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+from vision.intro_task import intro_task
+
+if __name__ == "__main__":
+    intro_task.main()

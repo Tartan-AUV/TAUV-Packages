@@ -1,0 +1,4 @@
+<launch>
+<node pkg="tauv_common" type="intro_task" name="intro_task" output="screen">
+</node>
+</launch>
