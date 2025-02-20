@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+from vision.starter_task import threshold_node
+
+if __name__ == "__main__":
+    threshold_node.main()
