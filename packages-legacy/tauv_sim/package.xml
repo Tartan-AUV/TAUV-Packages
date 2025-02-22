@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>tauv_sim</name>
+    <version>0.6.1</version>
+    <description>The TAUV Sim package.</description>
+
+    <maintainer email="theo@chemel.net">Theo Chemel</maintainer>
+
+    <license>Apache-2.0</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <exec_depend>stereo_image_proc</exec_depend>
+</package>
